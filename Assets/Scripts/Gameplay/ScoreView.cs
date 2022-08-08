@@ -12,7 +12,6 @@ namespace Gameplay
         [SerializeField] private TextMeshProUGUI _winner;
 
 
-
         private void Awake() =>
             Instance = this;
 

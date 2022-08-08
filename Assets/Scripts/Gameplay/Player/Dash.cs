@@ -5,15 +5,17 @@ namespace Gameplay
 {
     public class Dash : NetworkBehaviour
     {
+        private const float AnimatorDashSpeed = 4;
         [SerializeField] private float _distance = 10;
         private float DashTime = 0.5f;
         private float _speed;
 
-        [SyncVar]
+        [SyncVar(hook = nameof(OnIsDashingChanged))]
         private bool _isDashing;
         private Vector3 _targetPosition;
         private PlayerAnimator _animator;
         public bool IsDashing => _isDashing;
+
 
         public void Initialize(PlayerAnimator animator)
         {
@@ -21,31 +23,39 @@ namespace Gameplay
             _speed = _distance / DashTime;
         }
 
-        [ServerCallback]
+        [Client]
         private void Update()
         {
             if (_isDashing)
                 Dashing();
         }
-        [ServerCallback]
+
+        [TargetRpc]
         public void ResetDash() =>
             EndDash();
+
         [Command]
-        public void StartDash(float basicSpeed)
+        public void StartDash()
         {
             if (_isDashing)
                 return;
-
-            _targetPosition = transform.position + transform.forward * _distance;
             _isDashing = true;
-            ChangeAnimatorSpeed(_speed / basicSpeed);
         }
 
-        [ClientRpc]
-        private void ChangeAnimatorSpeed(float basicSpeed) =>
-            _animator.ChangeAnimatorSpeed(basicSpeed);
+        [Client]
+        private void OnIsDashingChanged(bool oldValue, bool newValue)
+        {
+            if (newValue == true)
+            {
+                _targetPosition = transform.position + transform.forward * _distance;
+                _animator.ChangeAnimation(AnimationState.Run);
+                _animator.ChangeAnimatorSpeed(AnimatorDashSpeed);
+            }
+            else
+                _animator.ChangeAnimatorSpeed(_animator.DefaultAnimatorSpeed);
+        }
 
-        [ServerCallback]
+        [Client]
         private void Dashing()
         {
             transform.position = Vector3.MoveTowards(transform.position, _targetPosition, _speed * Time.deltaTime);
@@ -53,12 +63,9 @@ namespace Gameplay
                 EndDash();
         }
 
-        [ServerCallback]
-        private void EndDash()
-        {
+        [Command]
+        private void EndDash() =>
             _isDashing = false;
-            ChangeAnimatorSpeed(_animator.DefaultAnimatorSpeed);
-        }
 
     }
 }

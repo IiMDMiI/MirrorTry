@@ -7,14 +7,13 @@ namespace Gameplay
     public class ClashController : NetworkBehaviour
     {
         private const int ScorePointsForClash = 1;
-
         [SerializeField] private int _ignoreTime = 3;
         [SyncVar(hook = nameof(OnIgnoreClashingSync))]
         public bool IgnoresClashing;
-        public bool IsDashing => _dash.IsDashing;
         private MaterialChanger _materialChanger;
         private Dash _dash;
         private PlayerScore _playerScore;
+        public bool IsDashing => _dash.IsDashing;
 
         public void Initialize(MaterialChanger materialChanger, Dash dash, PlayerScore playerScore)
         {
@@ -22,7 +21,6 @@ namespace Gameplay
             _dash = dash;
             _playerScore = playerScore;
         }
-
 
         [ServerCallback]
         private void OnTriggerEnter(Collider other)

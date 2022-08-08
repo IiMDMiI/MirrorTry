@@ -17,19 +17,27 @@ namespace Gameplay
         [ServerCallback]
         public async void Restart()
         {
-            List<Transform> spawnPositions = NetworkManager.startPositions;
+            List<Transform> spawnPositions = new List<Transform>(NetworkManager.startPositions);
             await Task.Delay(MatchRespawnTime);
             foreach (var player in FindObjectsOfType<Player>())
             {
-                player.transform.position = spawnPositions[0].position;
-                player.transform.rotation = Quaternion.LookRotation(-player.transform.position);
+                ResetPosition(spawnPositions[0].position, player);
+                ResetRotation(player);
                 spawnPositions.RemoveAt(0);
                 player.GetComponent<PlayerScore>().ResetScore();
-                player.GetComponent<Dash>().ResetDash();              
+                player.GetComponent<Dash>().ResetDash();
+                player.GetComponent<ThirdPersonCamera>().ResetCamera();
                 ScoreView.Instance.ChangeWinnerText("");
             }
         }
 
+        [ClientRpc]
+        private void ResetPosition(Vector3 position, Player player) =>
+            player.transform.position = position;
+
+        [ClientRpc]
+        private void ResetRotation(Player player) =>
+            player.transform.rotation = Quaternion.LookRotation(-player.transform.position);
 
     }
 }

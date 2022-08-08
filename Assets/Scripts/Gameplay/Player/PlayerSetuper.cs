@@ -18,17 +18,15 @@ namespace Gameplay
             thirdPersonCamera.Initialize(input, transform, camera.transform);
 
             GetComponent<ClashController>().Initialize(GetComponent<MaterialChanger>(), dash, GetComponent<PlayerScore>());
-            
+            transform.rotation = Quaternion.LookRotation(-transform.position);
+
             if (isLocalPlayer)
             {   
                 Cursor.lockState = CursorLockMode.Locked;
                 Player player = GetComponent<Player>();
                 SetPlayerName(player.GetNameFromPlayerPrefs(), player);
-
                 camera.enabled = true;
-
                 GetComponent<Movement>().Initialize(input, animator, dash, camera);
-                RotateToSceneCenter();
                 thirdPersonCamera.SetCameraLookBehindCharacter();
             }
         }
@@ -37,9 +35,9 @@ namespace Gameplay
         private void SetPlayerName(string name, Player player) =>
             player.SyncName = name;
 
-        [Command]
-        private void RotateToSceneCenter() =>
-            transform.rotation = Quaternion.LookRotation(-transform.position);
+        
+       
+            
     }
 }
 

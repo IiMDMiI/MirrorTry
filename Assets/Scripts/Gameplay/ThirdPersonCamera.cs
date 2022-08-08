@@ -22,13 +22,15 @@ namespace Gameplay
             _camera = camera;
         }
 
+        [TargetRpc] public void ResetCamera() =>
+            SetCameraLookBehindCharacter();
         public void SetCameraLookBehindCharacter()
         {
             if (!isLocalPlayer)
                 return;
           
             _angles = Quaternion.LookRotation(-transform.position.normalized).eulerAngles;
-            _angles.x = MaxXAngle;
+            _angles.x = MinXAngle;
             _camera.position = _player.position + GetRotationVector();
             _camera.LookAt(_player);
         }
