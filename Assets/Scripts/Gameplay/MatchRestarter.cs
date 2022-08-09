@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using System.Threading.Tasks;
 using Mirror;
+
 
 namespace Gameplay
 {
@@ -18,6 +20,8 @@ namespace Gameplay
         public async void Restart()
         {
             List<Transform> spawnPositions = new List<Transform>(NetworkManager.startPositions);
+            spawnPositions = spawnPositions.OrderBy( sp => Random.Range(0, spawnPositions.Count)).ToList();
+
             await Task.Delay(MatchRespawnTime);
             foreach (var player in FindObjectsOfType<Player>())
             {

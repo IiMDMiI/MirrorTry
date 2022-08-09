@@ -5,8 +5,9 @@ namespace Gameplay
 {
     public class ThirdPersonCamera : NetworkBehaviour
     {
-        private const int MinXAngle = 190;
-        private const int MaxXAngle = 210;
+        private const int MinXAngle = 100;
+        private const int MaxXAngle = 250;
+        private const int StartXAngle = 200;
         
         private Vector3 _angles;
         private float _radius = 8;
@@ -30,7 +31,7 @@ namespace Gameplay
                 return;
           
             _angles = Quaternion.LookRotation(-transform.position.normalized).eulerAngles;
-            _angles.x = MinXAngle;
+            _angles.x = StartXAngle;
             _camera.position = _player.position + GetRotationVector();
             _camera.LookAt(_player);
         }
@@ -64,7 +65,7 @@ namespace Gameplay
         private void AdjustAngles(Vector2 rotationAxis)
         {
             _angles.y += rotationAxis.x * Time.deltaTime * _sensitivity;
-            _angles.x += rotationAxis.y * Time.deltaTime * _sensitivity;
+            _angles.x -= rotationAxis.y * Time.deltaTime * _sensitivity;
             _angles.x = Mathf.Clamp(_angles.x, MinXAngle, MaxXAngle);
         }
     }
